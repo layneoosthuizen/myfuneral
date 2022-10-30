@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>1099318727978-m4j9mvr7l1qrn0qmrqsk20jr0qq9df3h.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1099318727978-m4j9mvr7l1qrn0qmrqsk20jr0qq9df3h</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>1099318727978-h0t96hqi1l8c5f213l1siq7iul7bauak.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDJgxqNA9IOF6l2GfY6oLrLKWv8jo7Zquk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1099318727978</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.myfuneral</string>
+	<key>PROJECT_ID</key>
+	<string>myfuneralplan-77b55</string>
+	<key>STORAGE_BUCKET</key>
+	<string>myfuneralplan-77b55.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1099318727978:ios:cc0597cd2922eb35197a53</string>
+	<key>DATABASE_URL</key>
+	<string>https://myfuneralplan-77b55-default-rtdb.europe-west1.firebasedatabase.app</string>
+</dict>
+</plist>
