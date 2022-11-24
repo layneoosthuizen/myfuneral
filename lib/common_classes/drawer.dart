@@ -1,61 +1,45 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter/cupertino.dart';
 
+import '../main.dart';
 import '../screens/Profile.dart';
 
 class MainDrawer extends StatefulWidget {
+  final String uUID;
+  final String fName;
+  final String lName;
+  final String policy;
   final String phoneNumber;
+  final String email;
+  final String utValue;
+  final String id;
 
-  const MainDrawer({Key? key, required this.phoneNumber}) : super(key: key);
+  const MainDrawer(
+      {Key? key,
+      required this.uUID,
+      required this.fName,
+      required this.lName,
+      required this.policy,
+      required this.phoneNumber,
+      required this.email,
+      required this.utValue,
+      required this.id})
+      : super(key: key);
 
   @override
   State<MainDrawer> createState() => _MainDrawerState();
 }
 
-final FirebaseAuth auth = FirebaseAuth.instance;
-final User? user = auth.currentUser;
-final uid = user?.uid;
-String name = "";
-String email = "";
-String phone = "";
-String userType = "";
-String utValue = "";
-
-var map = {};
-
 class _MainDrawerState extends State<MainDrawer> {
-  void getUserDetails() async {
-    FirebaseFirestore.instance
-        .collection("users")
-        .where("phone", isEqualTo: widget.phoneNumber)
-        .get()
-        .then((QuerySnapshot qs) => {
-              if (qs.docs.isNotEmpty)
-                {
-                  map = qs.docs.first.data() as Map,
-                  setState(() {
-                    name = map["name"];
-                    phone = map["phone"];
-                    email = map["email"];
-                    userType = map["userType"];
-                    utValue = map["utValue"];
-                  })
-                }
-            });
-  }
-
   @override
   @protected
   void initState() {
-    getUserDetails();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
+    return Scaffold(
+        body: Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
@@ -70,19 +54,19 @@ class _MainDrawerState extends State<MainDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name,
+                      "${widget.fName} ${widget.lName}",
                       textAlign: TextAlign.left,
                       style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 22,
+                          fontSize: 17,
                           fontStyle: FontStyle.italic),
                     ),
                     const SizedBox(
                       height: 10,
                     ),
                     Text(
-                      "Phone: $phone",
+                      "Phone: ${widget.policy}",
                       textAlign: TextAlign.left,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold,
@@ -93,7 +77,7 @@ class _MainDrawerState extends State<MainDrawer> {
                       height: 10,
                     ),
                     Text(
-                      "Email: $email",
+                      "Email: ${widget.email}",
                       textAlign: TextAlign.left,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold,
@@ -104,7 +88,7 @@ class _MainDrawerState extends State<MainDrawer> {
                       height: 10,
                     ),
                     Text(
-                      "User Type: $utValue",
+                      "User Type: ${widget.utValue}",
                       textAlign: TextAlign.left,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold,
@@ -119,56 +103,264 @@ class _MainDrawerState extends State<MainDrawer> {
           ExpansionTile(
             title: const Text('Personal'),
             children: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                Profile(phoneNumber: widget.phoneNumber)));
-                  },
-                  style: const ButtonStyle(
-                    alignment: Alignment.topLeft,
-                  ),
-                  child: const Text('Profile')),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                            GlobalContextService.navigatorKey.currentContext!,
+                            MaterialPageRoute(
+                                builder: (context) => Profile(
+                                      uUID: widget.uUID,
+                                      fName: widget.fName,
+                                      lName: widget.lName,
+                                      email: widget.email,
+                                      policy: widget.policy,
+                                      phoneNumber: widget.phoneNumber,
+                                      utValue: widget.utValue,
+                                      id: widget.id,
+                                    )));
+                      },
+                      style: const ButtonStyle(
+                        alignment: Alignment.topLeft,
+                      ),
+                      child: const Text('Profile')),
+                ],
+              )
             ],
           ),
           conditionalLayout(),
         ],
       ),
-    );
+    ));
   }
 
   conditionalLayout() {
-    if (userType == "1") {
+    if (widget.utValue == "Consumer") {
       return ExpansionTile(
-        title: const Text("My Policies"),
+        title: const Text("My Stuff"),
         children: [
           TextButton(
               onPressed: () {
                 Navigator.push(
-                    context,
+                    GlobalContextService.navigatorKey.currentContext!,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            Profile(phoneNumber: widget.phoneNumber)));
+                        builder: (context) => Profile(
+                              uUID: widget.uUID,
+                              fName: widget.fName,
+                              lName: widget.lName,
+                              email: widget.email,
+                              policy: widget.policy,
+                              phoneNumber: widget.phoneNumber,
+                              utValue: widget.utValue,
+                              id: widget.id,
+                            )));
               },
               style: const ButtonStyle(
                 alignment: Alignment.topLeft,
               ),
-              child: const Text('Profile')),
+              child: const Text(
+                'Profile',
+              )),
+          TextButton(
+              onPressed: () {
+                Navigator.push(
+                    GlobalContextService.navigatorKey.currentContext!,
+                    MaterialPageRoute(
+                        builder: (context) => Profile(
+                              uUID: widget.uUID,
+                              fName: widget.fName,
+                              lName: widget.lName,
+                              email: widget.email,
+                              policy: widget.policy,
+                              phoneNumber: widget.phoneNumber,
+                              utValue: widget.utValue,
+                              id: widget.id,
+                            )));
+              },
+              style: const ButtonStyle(
+                alignment: Alignment.topLeft,
+              ),
+              child: const Text(
+                'Link Policies',
+              )),
+          TextButton(
+              onPressed: () {
+                Navigator.push(
+                    GlobalContextService.navigatorKey.currentContext!,
+                    MaterialPageRoute(
+                        builder: (context) => Profile(
+                              uUID: widget.uUID,
+                              fName: widget.fName,
+                              lName: widget.lName,
+                              email: widget.email,
+                              policy: widget.policy,
+                              phoneNumber: widget.phoneNumber,
+                              utValue: widget.utValue,
+                              id: widget.id,
+                            )));
+              },
+              style: const ButtonStyle(
+                alignment: Alignment.topLeft,
+              ),
+              child: const Text(
+                'View/Update My Policies',
+              )),
+          TextButton(
+              onPressed: () {
+                Navigator.push(
+                    GlobalContextService.navigatorKey.currentContext!,
+                    MaterialPageRoute(
+                        builder: (context) => Profile(
+                              uUID: widget.uUID,
+                              fName: widget.fName,
+                              lName: widget.lName,
+                              email: widget.email,
+                              policy: widget.policy,
+                              phoneNumber: widget.phoneNumber,
+                              utValue: widget.utValue,
+                              id: widget.id,
+                            )));
+              },
+              style: const ButtonStyle(
+                alignment: Alignment.topLeft,
+              ),
+              child: const Text(
+                'Pay My Policies',
+              )),
+          TextButton(
+              onPressed: () {
+                Navigator.push(
+                    GlobalContextService.navigatorKey.currentContext!,
+                    MaterialPageRoute(
+                        builder: (context) => Profile(
+                              uUID: widget.uUID,
+                              fName: widget.fName,
+                              lName: widget.lName,
+                              email: widget.email,
+                              policy: widget.policy,
+                              phoneNumber: widget.phoneNumber,
+                              utValue: widget.utValue,
+                              id: widget.id,
+                            )));
+              },
+              style: const ButtonStyle(
+                alignment: Alignment.topLeft,
+              ),
+              child: const Text(
+                'Log a Claim',
+              )),
+          TextButton(
+              onPressed: () {
+                Navigator.push(
+                    GlobalContextService.navigatorKey.currentContext!,
+                    MaterialPageRoute(
+                        builder: (context) => Profile(
+                              uUID: widget.uUID,
+                              fName: widget.fName,
+                              lName: widget.lName,
+                              email: widget.email,
+                              policy: widget.policy,
+                              phoneNumber: widget.phoneNumber,
+                              utValue: widget.utValue,
+                              id: widget.id,
+                            )));
+              },
+              style: const ButtonStyle(
+                alignment: Alignment.topLeft,
+              ),
+              child: const Text(
+                'Check Status of Existing Claim',
+              )),
+          TextButton(
+              onPressed: () {
+                Navigator.push(
+                    GlobalContextService.navigatorKey.currentContext!,
+                    MaterialPageRoute(
+                        builder: (context) => Profile(
+                              uUID: widget.uUID,
+                              fName: widget.fName,
+                              lName: widget.lName,
+                              email: widget.email,
+                              policy: widget.policy,
+                              phoneNumber: widget.phoneNumber,
+                              utValue: widget.utValue,
+                              id: widget.id,
+                            )));
+              },
+              style: const ButtonStyle(
+                alignment: Alignment.topLeft,
+              ),
+              child: const Text(
+                'Buy a New Policy',
+              )),
+          TextButton(
+              onPressed: () {
+                Navigator.push(
+                    GlobalContextService.navigatorKey.currentContext!,
+                    MaterialPageRoute(
+                        builder: (context) => Profile(
+                              uUID: widget.uUID,
+                              fName: widget.fName,
+                              lName: widget.lName,
+                              email: widget.email,
+                              policy: widget.policy,
+                              phoneNumber: widget.phoneNumber,
+                              utValue: widget.utValue,
+                              id: widget.id,
+                            )));
+              },
+              style: const ButtonStyle(
+                alignment: Alignment.topLeft,
+              ),
+              child: const Text(
+                'Add/Change Beneficiaries',
+              )),
+          TextButton(
+              onPressed: () {
+                Navigator.push(
+                    GlobalContextService.navigatorKey.currentContext!,
+                    MaterialPageRoute(
+                        builder: (context) => Profile(
+                              uUID: widget.uUID,
+                              fName: widget.fName,
+                              lName: widget.lName,
+                              email: widget.email,
+                              policy: widget.policy,
+                              phoneNumber: widget.phoneNumber,
+                              utValue: widget.utValue,
+                              id: widget.id,
+                            )));
+              },
+              style: const ButtonStyle(
+                alignment: Alignment.topLeft,
+              ),
+              child: const Text(
+                'Confirm Death of Family Member',
+              )),
         ],
       );
-    } else if (userType == "2") {
+    } else if (widget.utValue == "Agent") {
       return ExpansionTile(
         title: const Text("Funeral Services"),
         children: [
           TextButton(
               onPressed: () {
                 Navigator.push(
-                    context,
+                    GlobalContextService.navigatorKey.currentContext!,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            Profile(phoneNumber: widget.phoneNumber)));
+                        builder: (context) => Profile(
+                              uUID: widget.uUID,
+                              fName: widget.fName,
+                              lName: widget.lName,
+                              email: widget.email,
+                              policy: widget.policy,
+                              phoneNumber: widget.phoneNumber,
+                              utValue: widget.utValue,
+                              id: widget.id,
+                            )));
               },
               style: const ButtonStyle(
                 alignment: Alignment.centerLeft,
@@ -176,17 +368,25 @@ class _MainDrawerState extends State<MainDrawer> {
               child: const Text('Profile')),
         ],
       );
-    } else if (userType == "3") {
+    } else if (widget.utValue == "FSP") {
       return ExpansionTile(
         title: const Text("Agent Services"),
         children: [
           TextButton(
               onPressed: () {
                 Navigator.push(
-                    context,
+                    GlobalContextService.navigatorKey.currentContext!,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            Profile(phoneNumber: widget.phoneNumber)));
+                        builder: (context) => Profile(
+                              uUID: widget.uUID,
+                              fName: widget.fName,
+                              lName: widget.lName,
+                              email: widget.email,
+                              policy: widget.policy,
+                              phoneNumber: widget.phoneNumber,
+                              utValue: widget.utValue,
+                              id: widget.id,
+                            )));
               },
               style: const ButtonStyle(
                 alignment: Alignment.centerLeft,
@@ -194,40 +394,35 @@ class _MainDrawerState extends State<MainDrawer> {
               child: const Text('Profile')),
         ],
       );
-    } else if (userType == "4") {
+    } else if (widget.utValue == "Insurer") {
       return ExpansionTile(
         title: const Text("FSP Services"),
         children: [
-          TextButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            Profile(phoneNumber: widget.phoneNumber)));
-              },
-              style: const ButtonStyle(
-                alignment: Alignment.centerLeft,
-              ),
-              child: const Text('Profile')),
-        ],
-      );
-    } else if (userType == "5") {
-      return ExpansionTile(
-        title: const Text("Insurer"),
-        children: [
-          TextButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            Profile(phoneNumber: widget.phoneNumber)));
-              },
-              style: const ButtonStyle(
-                alignment: Alignment.centerLeft,
-              ),
-              child: const Text('Profile')),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                        GlobalContextService.navigatorKey.currentContext!,
+                        MaterialPageRoute(
+                            builder: (context) => Profile(
+                                  uUID: widget.uUID,
+                                  fName: widget.fName,
+                                  lName: widget.lName,
+                                  email: widget.email,
+                                  policy: widget.policy,
+                                  phoneNumber: widget.phoneNumber,
+                                  utValue: widget.utValue,
+                                  id: widget.id,
+                                )));
+                  },
+                  style: const ButtonStyle(
+                    alignment: Alignment.centerLeft,
+                  ),
+                  child: const Text('Profile')),
+            ],
+          )
         ],
       );
     }

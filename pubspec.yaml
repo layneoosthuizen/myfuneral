@@ -21,6 +21,15 @@ dependencies:
   connectivity: ^3.0.6
   easy_splash_screen: ^1.0.4
   cloud_firestore: ^4.0.2
+  flutter_redux: ^0.10.0
+  redux: ^5.0.0
+  flutter_redux_dev_tools: ^0.5.2
+  redux_thunk: ^0.4.0
+  http: ^0.13.5
+#  intl: ^0.17.0
+  adaptive_navbar: ^0.0.3
+  awesome_snackbar_content: ^0.0.9
+#  dropdown_search: ^5.0.3
 
 dev_dependencies:
   flutter_test:

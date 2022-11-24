@@ -1,15 +1,12 @@
-// ignore_for_file: constant_identifier_names
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-// import 'package:myfuneral/screens/Home.dart';
 
 import '../main.dart';
-import 'Home.dart';
+import 'ConsumerLanding.dart';
 import 'Profile.dart';
 
+// ignore: constant_identifier_names
 enum PhoneVerificationState { SHOW_PHONE_FORM_STATE, SHOW_OTP_FORM_STATE }
 
 class LoginScreen extends StatefulWidget {
@@ -23,21 +20,35 @@ class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKeyForSnackBar = GlobalKey();
   PhoneVerificationState currentState =
       PhoneVerificationState.SHOW_PHONE_FORM_STATE;
-  final phoneController = TextEditingController();
-  final otpController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController otpController = TextEditingController();
   late String verificationIDFromFirebase;
   bool spinnerLoading = false;
   bool profileExists = false;
+  String capturedPhone = "111";
+  String id = 'Not Found';
+  String uUID = "Not Found";
+  String docID = "Not Found";
+  String name = "Not Registered";
+  String fName = "Not Registered";
+  String lName = "Not Registered";
+  String email = "Not Found";
+  String policy = "Not Found";
+  String phoneNumber = "Not Found";
+  String userType = "Not Found";
+  String utValue = "Not Found";
+
+  var map = {};
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-
 
   _verifyPhoneButton() async {
     setState(() {
       spinnerLoading = true;
+      capturedPhone = _phoneController.text;
     });
     await _firebaseAuth.verifyPhoneNumber(
-        phoneNumber: phoneController.text,
+        phoneNumber: _phoneController.text,
         verificationCompleted: (phoneAuthCredential) async {
           setState(() {
             spinnerLoading = false;
@@ -63,14 +74,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   _verifyOTPButton() async {
-    await FirebaseFirestore.instance.collection("users")
-        .where("phone", isEqualTo: phoneController.text)
-        .get()
-        .then((value) => {
-      if(value.size > 0) {
-        profileExists = true,
-      }});
-
     PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(
         verificationId: verificationIDFromFirebase,
         smsCode: otpController.text);
@@ -82,28 +85,47 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       spinnerLoading = true;
     });
+    //Check if user has a profile
+    getUserDetails();
+    // await getUserDetails();
     try {
       final authCredential =
-      await _firebaseAuth.signInWithCredential(phoneAuthCredential);
+          await _firebaseAuth.signInWithCredential(phoneAuthCredential);
       setState(() {
         spinnerLoading = false;
+        uUID = authCredential.user!.uid;
       });
       if (authCredential.user != null) {
-
-        if(profileExists) {
+        if (profileExists == true) {
           Navigator.push(
               GlobalContextService.navigatorKey.currentContext!,
-              MaterialPageRoute(builder: (context) => Profile(phoneNumber: phoneController.text)));
+              MaterialPageRoute(
+                  builder: (context) => ConsumerLandingScreen(
+                        uUID: uUID,
+                        fName: fName,
+                        lName: lName,
+                        email: email,
+                        policy: policy,
+                        phoneNumber: capturedPhone,
+                        utValue: utValue,
+                        id: id,
+                      )));
         } else {
           Navigator.push(
               GlobalContextService.navigatorKey.currentContext!,
-              MaterialPageRoute(builder: (context) => Home(phoneNumber: phoneController.text)));
+              MaterialPageRoute(
+                  builder: (context) => Profile(
+                        uUID: uUID,
+                        fName: fName,
+                        lName: lName,
+                        email: email,
+                        policy: policy,
+                        phoneNumber: capturedPhone,
+                        utValue: utValue,
+                        id: id,
+                      )));
         }
-      } else {
-        // Navigator.push(
-        //     GlobalContextService.navigatorKey.currentContext!,
-        //     MaterialPageRoute(builder: (context) => Home(phoneNumber: phoneController.text)));
-      }
+      } else {}
     } on FirebaseAuthException catch (e) {
       setState(() {
         spinnerLoading = false;
@@ -111,6 +133,30 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.message.toString())));
     }
+  }
+
+  getUserDetails() {
+    setState(() {
+      capturedPhone = _phoneController.text;
+    });
+    FirebaseFirestore.instance
+        .collection("users")
+        .where("phone", isEqualTo: capturedPhone)
+        .get()
+        .then((QuerySnapshot qs) => {
+              if (qs.docs.isNotEmpty)
+                {
+                  map = qs.docs.first.data() as Map,
+                  setState(() {
+                    profileExists = true;
+                    fName = map["fName"];
+                    lName = map["lName"];
+                    policy = map["policy"];
+                    email = map["email"];
+                    utValue = map["utValue"];
+                  }),
+                }
+            });
   }
 
   getPhoneFormWidget(context) {
@@ -121,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
           style: TextStyle(fontSize: 16.0),
         ),
         const Text(
-          'Use country code and remove leading zero (e.g. (082) 853-6652 =  +27828536652)',
+          'Use country code and remove leading zero \n (e.g. (082) 853-6652 =  +27828536652)',
           style: (TextStyle(fontSize: 12.0)),
         ),
         const SizedBox(
@@ -130,24 +176,29 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(
           width: 200.0,
           child: TextField(
+            autofocus: true,
             keyboardType: TextInputType.phone,
             maxLength: 12,
-            //inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            controller: phoneController,
+            controller: _phoneController,
             textAlign: TextAlign.start,
             decoration: const InputDecoration(
                 hintText: "Phone Number",
+                border: OutlineInputBorder(),
+                labelText: 'Phone Number',
                 prefixIcon: Icon(Icons.phone_android_rounded)),
+            style: const TextStyle(
+              fontSize: 14,
+            ),
           ),
         ),
-
         const SizedBox(
           height: 20.0,
         ),
         ElevatedButton(
             onPressed: () => _verifyPhoneButton(),
             style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.white, backgroundColor: Colors.grey.shade900, // foreground
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.grey.shade900, // foreground
             ),
             child: const Text("Verify Phone Number")),
       ],
@@ -167,12 +218,18 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(
           width: 200.0,
           child: TextField(
-          controller: otpController,
-          textAlign: TextAlign.start,
-          decoration: const InputDecoration(
-              hintText: "OTP Number",
-              prefixIcon: Icon(Icons.confirmation_number_rounded)),
-        ),
+            autofocus: true,
+            keyboardType: TextInputType.number,
+            controller: otpController,
+            textAlign: TextAlign.start,
+            decoration: const InputDecoration(
+                hintText: "OTP Number",
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.confirmation_number_rounded)),
+            style: const TextStyle(
+              fontSize: 14,
+            ),
+          ),
         ),
         const SizedBox(
           height: 20.0,
@@ -180,7 +237,8 @@ class _LoginScreenState extends State<LoginScreen> {
         ElevatedButton(
           onPressed: () => _verifyOTPButton(),
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white, backgroundColor: Colors.grey.shade900, // foreground
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.grey.shade900, // foreground
           ),
           child: const Text("Verify OTP Number"),
         ),
@@ -206,58 +264,58 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-          key: _scaffoldKeyForSnackBar,
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      key: _scaffoldKeyForSnackBar,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                height: 20.0,
+              ),
+              Column(
                 children: [
+                  const SizedBox(
+                    height: 30.0,
+                  ),
+                  const Text(
+                    "unLabled Login",
+                    style:
+                        TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(
                     height: 20.0,
                   ),
-                  Column(
-                    children: [
-                      const SizedBox(
-                        height: 30.0,
-                      ),
-                      const Text(
-                        "My Funeral Policies Login",
-                        style:
-                        TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        height: 20.0,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: const [
-                          Image(image: AssetImage(
-                            'assets/images/myfunerallogo.jpeg'),
-                            // 'assets/images/hand_with_phone_127px.png'),
-                            fit: BoxFit.fitWidth),
-                          //   scale: 2,
-                          // Image(image: AssetImage(
-                          //     'assets/images/verified_127px.png'),
-                          //     fit: BoxFit.fitWidth),
-                        ],
-                      ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: const [
+                      Image(
+                          image: AssetImage('assets/images/myfunerallogo.jpeg'),
+                          // 'assets/images/hand_with_phone_127px.png'),
+                          fit: BoxFit.fitWidth),
+                      //   scale: 2,
+                      // Image(image: AssetImage(
+                      //     'assets/images/verified_127px.png'),
+                      //     fit: BoxFit.fitWidth),
                     ],
                   ),
-                  const SizedBox(
-                    height: 40.0,
-                  ),
-                  spinnerLoading
-                      ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                      : currentState == PhoneVerificationState.SHOW_PHONE_FORM_STATE
-                      ? getPhoneFormWidget(context)
-                      : getOTPFormWidget(context),
                 ],
               ),
-            ),
+              const SizedBox(
+                height: 40.0,
+              ),
+              spinnerLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : currentState == PhoneVerificationState.SHOW_PHONE_FORM_STATE
+                      ? getPhoneFormWidget(context)
+                      : getOTPFormWidget(context),
+            ],
           ),
-        ));
+        ),
+      ),
+    ));
   }
 }

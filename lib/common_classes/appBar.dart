@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:myfuneral/main.dart';
+import '../main.dart';
 
 import '../screens/LoginScreen.dart';
 
@@ -16,23 +16,20 @@ class MyAppBar extends StatefulWidget {
 }
 
 class _MyAppBarState extends State<MyAppBar> {
-
   profile({required String phoneNumber, required String title}) {
     // myAppBar(title: title, phoneNumber: phoneNumber);
   }
 
   signOut() async {
     await FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(
-        GlobalContextService.navigatorKey.currentContext!,
+    Navigator.pushReplacement(GlobalContextService.navigatorKey.currentContext!,
         MaterialPageRoute(builder: (context) => const LoginScreen()));
   }
 
   @override
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    return
-    AppBar(
+    // var screenSize = MediaQuery.of(context).size;
+    return AppBar(
       title: Text(widget.title),
       backgroundColor: Colors.blue,
       actions: <Widget>[
@@ -53,8 +50,10 @@ AppBar myAppBar({required String title, required String phoneNumber}) {
     actions: <Widget>[
       IconButton(
           onPressed: () => {
-            Navigator.of(GlobalContextService.navigatorKey.currentContext!,).pop(),
-          },
+                Navigator.of(
+                  GlobalContextService.navigatorKey.currentContext!,
+                ).pop(),
+              },
           icon: const Icon(Icons.arrow_back_sharp)),
     ],
   );
